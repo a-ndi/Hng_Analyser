@@ -4,11 +4,8 @@ package com.hng.Analyser.Service;
 import com.hng.Analyser.Model.AnalysedString;
 import com.hng.Analyser.Model.AnalysedStringProperties;
 import com.hng.Analyser.Repo.AnalyserRepo;
-//import org.springframework.data.crossstore.ChangeSetPersister;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;

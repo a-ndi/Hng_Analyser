@@ -22,7 +22,7 @@ public class AnalyserController {
         this.analyserService = analyserService;
     }
 
-    @PostMapping("analyse")
+    @PostMapping("/analyse")
     public ResponseEntity<?> analyse(@RequestBody AnalyseRequestBody inputString) {
 
         if (inputString == null || inputString.getValue() == null) {
@@ -40,14 +40,7 @@ public class AnalyserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
-
-    @GetMapping("analyse/{stringValue}")
-    public ResponseEntity<AnalysedString> getByValue(@PathVariable String stringValue) {
-        AnalysedString found = analyserService.getByValue(stringValue);
-        return ResponseEntity.ok(found);
-    }
-
-    @GetMapping("analyse")
+    @GetMapping("/analyse")
     public ResponseEntity<?> getAll(
             @RequestParam(required = false) Boolean is_palindrome,
             @RequestParam(required = false) Integer min_length,
@@ -73,7 +66,11 @@ public class AnalyserController {
         return ResponseEntity.ok(resp);
     }
 
-
+    @GetMapping("/analyse/{stringValue}")
+    public ResponseEntity<AnalysedString> getByValue(@PathVariable String stringValue) {
+        AnalysedString found = analyserService.getByValue(stringValue);
+        return ResponseEntity.ok(found);
+    }
 
     @GetMapping("/filter-by-natural-language")
     public ResponseEntity<?> naturalLanguageFilter(@RequestParam String query) {
@@ -113,7 +110,7 @@ public class AnalyserController {
     }
 
     // 5. Delete string by value
-    @DeleteMapping("analyse/{stringValue}")
+    @DeleteMapping("/analyse/{stringValue}")
     public ResponseEntity<Void> delete(@PathVariable String stringValue) {
         analyserService.deleteByValue(stringValue);
         return ResponseEntity.noContent().build();
