@@ -4,6 +4,8 @@ package com.hng.Analyser.Service;
 import com.hng.Analyser.Model.AnalysedString;
 import com.hng.Analyser.Model.AnalysedStringProperties;
 import com.hng.Analyser.Repo.AnalyserRepo;
+import com.hng.Analyser.Service.errors.NewResponseStatusException;
+import com.hng.Analyser.Service.errors.NotFoundException;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
@@ -43,8 +45,7 @@ public class AnalyserService {
     }
 
     public AnalysedString getByValue(String value) {
-        return analyserRepo.findByValue(value)
-                .orElseThrow(() -> new NewResponseStatusException("String does not exist in the system"));
+        return null;
     }
 
     public AnalysedString getById(Integer id) {
@@ -128,4 +129,7 @@ public class AnalyserService {
     }
 
 
+    public boolean exists(String value) {
+        return analyserRepo.findByValue(value).isPresent();
+    }
 }

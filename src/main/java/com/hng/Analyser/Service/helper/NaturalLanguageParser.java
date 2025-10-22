@@ -1,4 +1,4 @@
-package com.hng.Analyser.Service;
+package com.hng.Analyser.Service.helper;
 
 import java.util.HashMap;
 import java.util.Map;

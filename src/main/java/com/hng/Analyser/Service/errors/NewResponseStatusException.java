@@ -1,12 +1,8 @@
-package com.hng.Analyser.Service;
+package com.hng.Analyser.Service.errors;
 
 
 public class NewResponseStatusException extends RuntimeException{
     public NewResponseStatusException(String message) {
         super(message);
-    }
-
-    public NewResponseStatusException(String message, Throwable cause) {
-        super(message, cause);
     }
 }

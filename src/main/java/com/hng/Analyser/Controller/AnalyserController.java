@@ -2,9 +2,13 @@ package com.hng.Analyser.Controller;
 
 
 import com.hng.Analyser.Model.AnalysedString;
-import com.hng.Analyser.Service.AnalyseRequestBody;
+import com.hng.Analyser.Service.errors.BadRequestException;
+import com.hng.Analyser.Service.errors.InvalidDataTypeException;
+import com.hng.Analyser.Service.errors.ResourceConflictException;
+import com.hng.Analyser.Service.model.AnalyseRequestBody;
 import com.hng.Analyser.Service.AnalyserService;
-import com.hng.Analyser.Service.NaturalLanguageParser;
+import com.hng.Analyser.Service.helper.NaturalLanguageParser;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,20 +27,30 @@ public class AnalyserController {
     }
 
     @PostMapping("/analyse")
-    public ResponseEntity<?> analyse(@RequestBody AnalyseRequestBody inputString) {
+    public ResponseEntity<?> analyse(@Valid @RequestBody AnalyseRequestBody inputString) {
 
         if (inputString == null || inputString.getValue() == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Missing 'value' field"));
+            throw new BadRequestException("Invalid request body or missing 'value' field");
         }
 
-        Object value = inputString.getValue();
-        if (inputString.getValue().isEmpty()) {
-            return ResponseEntity.status(422).body(Map.of("error", "'value' must be a string"));
+        String value = inputString.getValue().trim();
+
+        if (value.isEmpty()) {
+            throw new BadRequestException("'value' cannot be empty");
+        }
+
+        // reject invalid types (e.g., number disguised as string)
+        if (!value.matches("^[A-Za-z\\s]+$")) {
+            throw new InvalidDataTypeException("Invalid data type for 'value' (must be string)");
         }
 
 
-        String payload = (String) value;
-        AnalysedString saved = analyserService.analyse(payload);
+        // check for duplicates
+        if (analyserService.exists(value)) {
+            throw new ResourceConflictException("String already exists in the system");
+        }
+
+        AnalysedString saved = analyserService.analyse(value);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
