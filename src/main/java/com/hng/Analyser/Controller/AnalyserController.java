@@ -24,7 +24,6 @@ public class AnalyserController {
 
     @PostMapping("analyse")
     public ResponseEntity<?> analyse(@RequestBody AnalyseRequestBody inputString) {
-        //String payload = inputString.getValue();
 
         if (inputString == null || inputString.getValue() == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Missing 'value' field"));
