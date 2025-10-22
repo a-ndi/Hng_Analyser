@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
@@ -83,8 +84,12 @@ public class AnalyserController {
 
     @GetMapping("/strings/{string_value}")
     public ResponseEntity<AnalysedString> getByValue(@PathVariable String string_value) {
-        AnalysedString found = analyserService.getByValue(string_value);
-        return ResponseEntity.ok(found);
+        Optional<AnalysedString> found = analyserService.getByValue(string_value);
+        if (found.isPresent()){
+            return ResponseEntity.ok(found.get());
+        } else {
+            throw new ResourceNotFoundException("String does not exist in the system");
+        }
     }
 
     @GetMapping("/strings/filter-by-natural-language")
@@ -97,7 +102,7 @@ public class AnalyserController {
         try {
             parsed = NaturalLanguageParser.parse(query);
         } catch (Exception e) {
-            return ResponseEntity.status(400).body(Map.of("error","Unable to parse natural language query"));
+            throw new BadRequestException("Unable to parse natural language query");
         }
 
         // convert parsed filters to service filter call
@@ -107,7 +112,7 @@ public class AnalyserController {
 
         if (minLen != null && maxLen != null && minLen > maxLen) {
             // Corresponds to 422 Unprocessable Entity: Query parsed but resulted in conflicting filters
-            return ResponseEntity.status(422).body(Map.of("error", "Query parsed but resulted in conflicting filters"));
+            throw new InvalidDataTypeException("Query parsed but resulted in conflicting filters");
         }
 
         Integer wc = (Integer) parsed.parsedFilters.getOrDefault("word_count", null);

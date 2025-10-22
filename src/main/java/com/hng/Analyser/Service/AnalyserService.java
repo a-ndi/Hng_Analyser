@@ -53,6 +53,10 @@ public class AnalyserService {
         return true;
     }
 
+    public Optional<AnalysedString> getByValue(String value) {
+        return analyserRepo.findByValue(value);
+    }
+
     // Filter logic for GET /api/analyse
     public List<AnalysedString> filter(Boolean isPalindrome,
                                        Integer minLength,
