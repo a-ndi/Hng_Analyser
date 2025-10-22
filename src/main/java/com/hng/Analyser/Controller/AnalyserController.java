@@ -5,6 +5,7 @@ import com.hng.Analyser.Model.AnalysedString;
 import com.hng.Analyser.Service.errors.BadRequestException;
 import com.hng.Analyser.Service.errors.InvalidDataTypeException;
 import com.hng.Analyser.Service.errors.ResourceConflictException;
+import com.hng.Analyser.Service.errors.ResourceNotFoundException;
 import com.hng.Analyser.Service.model.AnalyseRequestBody;
 import com.hng.Analyser.Service.AnalyserService;
 import com.hng.Analyser.Service.helper.NaturalLanguageParser;
@@ -26,7 +27,7 @@ public class AnalyserController {
         this.analyserService = analyserService;
     }
 
-    @PostMapping("/analyse")
+    @PostMapping("/strings")
     public ResponseEntity<?> analyse(@Valid @RequestBody AnalyseRequestBody inputString) {
 
         if (inputString == null || inputString.getValue() == null) {
@@ -54,7 +55,7 @@ public class AnalyserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
-    @GetMapping("/analyse")
+    @GetMapping("/strings")
     public ResponseEntity<?> getAll(
             @RequestParam(required = false) Boolean is_palindrome,
             @RequestParam(required = false) Integer min_length,
@@ -80,13 +81,13 @@ public class AnalyserController {
         return ResponseEntity.ok(resp);
     }
 
-    @GetMapping("/analyse/{stringValue}")
-    public ResponseEntity<AnalysedString> getByValue(@PathVariable String stringValue) {
-        AnalysedString found = analyserService.getByValue(stringValue);
+    @GetMapping("/strings/{string_value}")
+    public ResponseEntity<AnalysedString> getByValue(@PathVariable String string_value) {
+        AnalysedString found = analyserService.getByValue(string_value);
         return ResponseEntity.ok(found);
     }
 
-    @GetMapping("/filter-by-natural-language")
+    @GetMapping("/strings/filter-by-natural-language")
     public ResponseEntity<?> naturalLanguageFilter(@RequestParam String query) {
         if (query == null || query.trim().isEmpty()) {
             return ResponseEntity.badRequest().body(Map.of("error", "query is required"));
@@ -124,10 +125,13 @@ public class AnalyserController {
     }
 
     // 5. Delete string by value
-    @DeleteMapping("/analyse/{stringValue}")
+    @DeleteMapping("/strings/{string_value}")
     public ResponseEntity<Void> delete(@PathVariable String stringValue) {
-        analyserService.deleteByValue(stringValue);
-        return ResponseEntity.noContent().build();
+        boolean deleted = analyserService.deleteByValue(stringValue);
+        if (!deleted) {
+            throw new ResourceNotFoundException("String does not exist in the system");
+        }
+        return ResponseEntity.noContent().build(); // 204 No Content
     }
 }
 

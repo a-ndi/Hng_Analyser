@@ -47,9 +47,11 @@ public class GlobalExceptionHandler {
     }
 
 
-    @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<?> handleNotFound(ChangeSetPersister.NotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", ex.getMessage()));
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleNotFound(ResourceNotFoundException ex) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(Map.of("error", ex.getMessage()));
     }
 
     @ExceptionHandler(Exception.class)

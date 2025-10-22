@@ -4,8 +4,7 @@ package com.hng.Analyser.Service;
 import com.hng.Analyser.Model.AnalysedString;
 import com.hng.Analyser.Model.AnalysedStringProperties;
 import com.hng.Analyser.Repo.AnalyserRepo;
-import com.hng.Analyser.Service.errors.NewResponseStatusException;
-import com.hng.Analyser.Service.errors.NotFoundException;
+import com.hng.Analyser.Service.errors.ResourceNotFoundException;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +14,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -44,19 +44,13 @@ public class AnalyserService {
         return analyserRepo.save(result);
     }
 
-    public AnalysedString getByValue(String value) {
-        return null;
-    }
-
-    public AnalysedString getById(Integer id) {
-        return analyserRepo.findById(id)
-                .orElseThrow(() -> new NotFoundException("String not found"));
-    }
-
-
-    public void deleteByValue(String value) {
-        AnalysedString found = getByValue(value);
-        analyserRepo.delete(found);
+    public boolean deleteByValue(String value) {
+        Optional<AnalysedString> found = analyserRepo.findByValue(value);
+        if (found.isEmpty()) {
+            return false; // or throw new ResourceNotFoundException(...)
+        }
+        analyserRepo.delete(found.get());
+        return true;
     }
 
     // Filter logic for GET /api/analyse
